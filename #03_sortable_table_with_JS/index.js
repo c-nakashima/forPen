@@ -182,8 +182,8 @@ const data = [
 ];
 
 let currentPage = 1;
-const recordsPerPage = 4;
-const totalPage = Math.ceil(data.length / recordsPerPage);
+const rowsPerPage = 4;
+const totalPage = Math.ceil(data.length / rowsPerPage);
 
 const prevBtn = document.getElementById('prevBtn')
 const nextBtn = document.getElementById('nextBtn')
@@ -217,8 +217,8 @@ function updateTable(page) {
   currentPage = page;
   tbody.innerHTML = "";
   for (
-    let i = (page - 1) * recordsPerPage;
-    i < page * recordsPerPage && i < displayedData.length;
+    let i = (page - 1) * rowsPerPage;
+    i < page * rowsPerPage && i < displayedData.length;
     i++) {
     const tr = document.createElement('tr'); //TODO should this name be changed?(same 'tr' name is used global)
     const dataValues = Object.values(displayedData[i]);

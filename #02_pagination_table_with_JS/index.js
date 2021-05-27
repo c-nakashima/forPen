@@ -182,17 +182,21 @@ const data = [
 ];
 
 let currentPage = 1;
-const recordsPerPage = 4;
-const totalPage = Math.ceil(data.length / recordsPerPage);
+const rowsPerPage = 4;
+const totalPage = Math.ceil(data.length / rowsPerPage);
 
-const prevBtn = document.getElementById('prevBtn')
-const nextBtn = document.getElementById('nextBtn')
-const firstBtn = document.getElementById('firstBtn')
-const lastBtn = document.getElementById('lastBtn')
+const tableWrapper = document.getElementById('tableWrapper');
 
+// const prevBtn = document.createElement('li');
+// const nextBtn = document.createElement('li');
+// const firstBtn = document.createElement('li');
+// const lastBtn = document.createElement('li');
+
+//draw table and thead 
+const table = document.createElement('table');
 //draw thead
-const thead = document.querySelector('thead');
-const dataKeys = Object.keys(data[1]); //TODO or directly 4? 
+const thead = document.createElement('thead');
+const dataKeys = Object.keys(data[1]); //TODO もしデータが完璧じゃない場合はユーザーに表示するカラムを指定させる
 const tr = document.createElement('tr');
 for (let i = 0; i < dataKeys.length; i++) {
   const th = document.createElement('th');
@@ -200,26 +204,29 @@ for (let i = 0; i < dataKeys.length; i++) {
   tr.appendChild(th);
 }
 thead.appendChild(tr);
+table.appendChild(thead);
+tableWrapper.appendChild(table);
 
 //draw tbody and make tbody updatable
-const tbody = document.querySelector('tbody');
+const tbody = document.createElement('tbody');
+table.appendChild(tbody);
 
 function updateTable(page) {
   currentPage = page;
   tbody.innerHTML = "";
-  for (
-    let i = (page - 1) * recordsPerPage;
-    i < page * recordsPerPage && i < data.length;
-    i++) {
-    const tr = document.createElement('tr'); //TODO should this name be changed?(same 'tr' name is used global)
-    const dataValues = Object.values(data[i]);
-    for (let j = 0; j < dataKeys.length; j++) {
+  const startIndexInCurrentPage = (page - 1) * rowsPerPage;
+  const endIndexInCurrentPage = data.length > page * rowsPerPage ? page * rowsPerPage : data.length;
+  const rowsInCurrentPage = data.slice(startIndexInCurrentPage, endIndexInCurrentPage);
+  rowsInCurrentPage.forEach(row => {
+    const tr = document.createElement('tr');
+    const dataValues = Object.values(row);
+    dataValues.forEach(value => {
       const td = document.createElement('td');
-      td.innerHTML = dataValues[j];
+      td.innerHTML = value;
       tr.appendChild(td);
-    }
+    })
     tbody.appendChild(tr);
-  }
+  })
   updatePagination();
 }
 
@@ -236,11 +243,31 @@ function surroundingPages() {
     start = Math.max(currentPage - 2, 1);
     end = Math.min(currentPage + 2, totalPage);
   }
+  console.log('Array.from({ length: end - start + 1 }, (_, i) => start + i)', Array.from({ length: end - start + 1 }, (_, i) => start + i));
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 }
 
+//insert pagination block area
+tableWrapper.insertAdjacentHTML(
+  'beforeend',
+  `<ul id="paginationBlock">
+    <li id="firstBtn">&lt;&lt;</li>
+    <li id="prevBtn">&lt;</li>
+    <li>
+      <ul id="pagination">
+      </ul>
+    </li>
+    <li id="nextBtn">&gt;</li>
+    <li id="lastBtn">&gt;&gt;</li>
+  </ul>`
+);
+
 //draw pagination and make it updatable current pagination style
 const pagination = document.getElementById('pagination');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const firstBtn = document.getElementById('firstBtn');
+const lastBtn = document.getElementById('lastBtn');
 function updatePagination() {
   pagination.innerHTML = "";
   const surroundingPage = surroundingPages();
@@ -257,10 +284,10 @@ function updatePagination() {
 
   //hilight current page button
   const pageBtns = document.querySelectorAll(".page-btn");
-  for(let i = surroundingPage[0]; i<=surroundingPage[4]; i++){
-      if(currentPage === i){
-        pageBtns[i-surroundingPage[0]].classList.add("current");
-      }
+  for (let i = surroundingPage[0]; i <= surroundingPage[4]; i++) {
+    if (currentPage === i) {
+      pageBtns[i - surroundingPage[0]].classList.add("current");
+    }
   }
 
   //show/hide arrow button
