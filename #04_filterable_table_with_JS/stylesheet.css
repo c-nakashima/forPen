@@ -1,0 +1,150 @@
+*{
+  box-sizing: border-box;
+}
+
+body {
+  width: 400px;
+  margin: 0px auto;
+  padding: 20px 0;
+  font-family: "PT Sans Narrow", sans-serif;
+}
+
+h2 {
+  font-weight: 400;
+  margin: 0;
+  display: inline-block;
+}
+
+.table-description{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+#resetSortBtn{
+  font-size: 12px;
+  color: #6dc6c9;
+  cursor: pointer;
+}
+#resetSortBtn:hover{
+  color: #f3784b;
+}
+
+table {
+  width: 400px;
+  background-color: #fffaf7;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #dae6e8;
+}
+
+tr {
+  border-bottom: 1px solid #fff5f0;
+}
+tr:last-child {
+  border-bottom: none;
+}
+
+thead {
+  background-color: #6dc6c9;
+  color: #1d293f;
+  font-weight: 700;
+}
+
+th {
+  position: relative;
+  padding: 0.5em;
+}
+
+.fa, .fas {
+  display: inline!important;
+}
+
+.thead-btn{
+  color: #69748a;
+  cursor: pointer;
+}
+.sort-btn{
+  margin-left: 2px;
+  font-size: 12px;
+}
+.filter-btn{
+  margin-left: 0px;
+  font-size: 8px;
+}
+
+.fa-sort-up, .fa-sort-down{
+  color: #f3784b;
+}
+
+.selected{
+  color: #f3784b;
+}
+
+tbody {
+  color: #1d293f;
+  font-weight: 400;
+}
+
+td {
+  padding: 0.3em 0.5em;
+}
+
+
+#paginationBlock {
+  margin: 0.3em 0;
+}
+
+ul{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+li {
+  list-style: none;
+  padding: 0 0.2em;
+  cursor: pointer;
+}
+
+.current {
+  color: #6dc6c9;
+}
+
+.filter-box{
+  position: absolute;
+  right: 0;
+  display: none;
+  height: 100px;
+  padding: 4px;
+  overflow: scroll;
+  background-color: #FFFFFF;
+  border: 1px solid #69748a;
+}
+
+.filter-box ul {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.filter-box ul li{
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.filter-box ul li input{
+  margin: 1px 2px 0 0;
+  padding: 2px 0;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+}
+.filter-box ul li label{
+  text-align: left;
+}
