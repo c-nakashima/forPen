@@ -196,11 +196,11 @@ const tableWrapper = document.getElementById('tableWrapper');
 const table = document.createElement('table');
 //draw thead
 const thead = document.createElement('thead');
-const dataKeys = Object.keys(data[1]); //TODO もしデータが完璧じゃない場合はユーザーに表示するカラムを指定させる
+const columns = Object.keys(data[1]); //TODO もしデータが完璧じゃない場合はユーザーに表示するカラムを指定させる
 const tr = document.createElement('tr');
-for (let i = 0; i < dataKeys.length; i++) {
+for (let i = 0; i < columns.length; i++) {
   const th = document.createElement('th');
-  th.innerHTML = dataKeys[i];
+  th.innerHTML = columns[i];
   tr.appendChild(th);
 }
 thead.appendChild(tr);
@@ -231,7 +231,7 @@ function updateTable(page) {
 }
 
 //display 5 pages maximum
-function surroundingPages() {
+function currentSurroundingPages() {
   let start, end;
   if (currentPage <= 3) {
     start = 1;
@@ -243,7 +243,6 @@ function surroundingPages() {
     start = Math.max(currentPage - 2, 1);
     end = Math.min(currentPage + 2, totalPage);
   }
-  console.log('Array.from({ length: end - start + 1 }, (_, i) => start + i)', Array.from({ length: end - start + 1 }, (_, i) => start + i));
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 }
 
@@ -270,9 +269,9 @@ const firstBtn = document.getElementById('firstBtn');
 const lastBtn = document.getElementById('lastBtn');
 function updatePagination() {
   pagination.innerHTML = "";
-  const surroundingPage = surroundingPages();
+  const surroundingPages = currentSurroundingPages();
 
-  for (const i of surroundingPage) {
+  for (const i of surroundingPages) {
     const pageBtn = document.createElement("li");
     pageBtn.innerHTML = i;
     pageBtn.setAttribute("class", "page-btn");
@@ -284,11 +283,12 @@ function updatePagination() {
 
   //hilight current page button
   const pageBtns = document.querySelectorAll(".page-btn");
-  for (let i = surroundingPage[0]; i <= surroundingPage[4]; i++) {
+  for (const i of surroundingPages) {
     if (currentPage === i) {
-      pageBtns[i - surroundingPage[0]].classList.add("current");
+      pageBtns[i - surroundingPages[0]].classList.add("current");
     }
   }
+
 
   //show/hide arrow button
   switch (currentPage) {
