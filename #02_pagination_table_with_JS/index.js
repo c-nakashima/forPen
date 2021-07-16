@@ -289,7 +289,6 @@ function updatePagination() {
     }
   }
 
-
   //show/hide arrow button
   switch (currentPage) {
     case 1:

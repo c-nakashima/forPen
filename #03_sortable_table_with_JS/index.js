@@ -220,7 +220,7 @@ function updateTable(page) {
     let i = (page - 1) * rowsPerPage;
     i < page * rowsPerPage && i < displayedData.length;
     i++) {
-    const tr = document.createElement('tr'); //TODO should this name be changed?(same 'tr' name is used global)
+    const tr = document.createElement('tr');
     const dataValues = Object.values(displayedData[i]);
     for (let j = 0; j < dataKeys.length; j++) {
       const td = document.createElement('td');
@@ -297,7 +297,7 @@ function updatePagination() {
 //add eventlisteners to each buttons
 const resetSortBtn = document.getElementById('resetSortBtn');
 
-function addEventListeners() {
+function addEventListenerToPagination(){
   prevBtn.addEventListener("click", () => {
     updateTable(currentPage - 1);
   });
@@ -310,46 +310,78 @@ function addEventListeners() {
   lastBtn.addEventListener("click", () => {
     updateTable(totalPage);
   });
-  //set sort Buttotn
-  for (let i = 0; i < sortBtns.length; i++) {
-    sortBtns[i].setAttribute('data-type', dataKeys[i])
-    sortBtns[i].addEventListener('click', (e) => {
-      let page = currentPage;
-      let sortBtn = e.path[0];
-      let sortBtnOffsetY = e.offsetY;
-      //reset other colomn's class name
-      resetSortClass();
-      const key = e.path[0].getAttribute('data-type');
-      //sort clicked colomn
-      if (sortBtnOffsetY >= 20) {
-        sortBtn.className = "fas fa-sort-down sort-btn";
-        const sortData = data.slice().sort((a, b) => a[key] < b[key] ? -1 : 1);
-        displayedData = sortData;
-      } else if (sortBtnOffsetY < 20) {
-        sortBtn.className = "fas fa-sort-up sort-btn";
-        const sortData = data.slice().sort((a, b) => b[key] < a[key] ? -1 : 1);
-        displayedData = sortData;
-      }
-      updateTable(page);
-    })
-  }
-  //set reset Buttotn
-  resetSortBtn.addEventListener('click', () => {
-    resetSortClass();
-    page = currentPage;
-    displayedData = data;
-    updateTable(page);
-  })
 }
 
+
+function initSort(){
+    //set sort Buttotn
+
+    Array.from(sortBtns).forEach((sortBtn,i) =>{
+      sortBtn.setAttribute('data-type', dataKeys[i])
+      sortBtn.addEventListener('click', (e) => {
+        let page = currentPage;
+        let clickedSortBtn = e.path[0];
+        // let clickedSortBtnOffsetY = e.offsetY;
+
+        //reset other colomn's class name
+        resetSortClass();
+        const key = e.path[0].getAttribute('data-type');
+
+        // sort clicked colomn
+        const sortOrder = clickedSortBtn.classList.contains("fa-sort-down") ? 'up' : 'down';
+        clickedSortBtn.className = `fas fa-sort-${sortOrder} sort-btn`; //TODO 正攻法で書いてみる
+
+        // let sortOrder;
+        // if(clickedSortBtn.classList.contains("fa-sort-up")){
+        //   sortOrder = 'down';
+        //   clickedSortBtn.className = `fas fa-sort-down sort-btn`;
+        // }else{
+        //   sortOrder = 'up';
+        //   clickedSortBtn.className = `fas fa-sort-up sort-btn`;
+        // }
+
+        const sortData = data.slice().sort((a, b) => {
+          if(sortOrder === 'up'){
+            return a[key] < b[key] ? -1 : 1
+          }else if(sortOrder === 'down'){
+            return b[key] < a[key] ? -1 : 1
+          }
+        });
+
+        displayedData = sortData;
+
+        // if (clickedSortBtnOffsetY >= 20) {
+        //   clickedSortBtn.className = "fas fa-sort-down sort-btn";
+        //   const sortData = data.slice().sort((a, b) => a[key] < b[key] ? -1 : 1);
+        //   displayedData = sortData;
+        // } else if (clickedSortBtnOffsetY < 20) {
+        //   clickedSortBtn.className = "fas fa-sort-up sort-btn";
+        //   const sortData = data.slice().sort((a, b) => b[key] < a[key] ? -1 : 1);
+        //   displayedData = sortData;
+        // }
+
+
+        updateTable(page);
+      })
+    })
+
+    //set reset Buttotn
+    resetSortBtn.addEventListener('click', () => {
+      resetSortClass();
+      page = currentPage;
+      displayedData = data;
+      updateTable(page);
+    })
+}
 
 
 //init
 let displayedData;
 function init() {
   displayedData = data;
-  updateTable(1)
-  addEventListeners()
+  updateTable(1);
+  addEventListenerToPagination();
+  initSort();
 }
 
 init();
