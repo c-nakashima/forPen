@@ -204,9 +204,13 @@ thead.appendChild(tr);
 
 //reset sort classname
 const sortBtns = document.getElementsByClassName('sort-btn');
-function resetSortClass(){
+
+// function resetSortClass(exception = false){
+function resetSortClass(key = false){
   for (let i = 0; i < sortBtns.length; i++) {
-    sortBtns[i].className = "fas fa-sort sort-btn";
+    if(key !== sortBtns[i].getAttribute('data-type')){
+      sortBtns[i].className = "fas fa-sort sort-btn";
+    }
   }
 }
 
@@ -320,25 +324,17 @@ function initSort(){
       sortBtn.setAttribute('data-type', dataKeys[i])
       sortBtn.addEventListener('click', (e) => {
         let page = currentPage;
-        let clickedSortBtn = e.path[0];
+        let clickedSortBtn = e.target;
         // let clickedSortBtnOffsetY = e.offsetY;
 
         //reset other colomn's class name
-        resetSortClass();
-        const key = e.path[0].getAttribute('data-type');
+        const key = e.target.getAttribute('data-type');
+        resetSortClass(key);
 
         // sort clicked colomn
         const sortOrder = clickedSortBtn.classList.contains("fa-sort-down") ? 'up' : 'down';
+        console.log('sortOrder',sortOrder)
         clickedSortBtn.className = `fas fa-sort-${sortOrder} sort-btn`; //TODO 正攻法で書いてみる
-
-        // let sortOrder;
-        // if(clickedSortBtn.classList.contains("fa-sort-up")){
-        //   sortOrder = 'down';
-        //   clickedSortBtn.className = `fas fa-sort-down sort-btn`;
-        // }else{
-        //   sortOrder = 'up';
-        //   clickedSortBtn.className = `fas fa-sort-up sort-btn`;
-        // }
 
         const sortData = data.slice().sort((a, b) => {
           if(sortOrder === 'up'){
@@ -349,18 +345,6 @@ function initSort(){
         });
 
         displayedData = sortData;
-
-        // if (clickedSortBtnOffsetY >= 20) {
-        //   clickedSortBtn.className = "fas fa-sort-down sort-btn";
-        //   const sortData = data.slice().sort((a, b) => a[key] < b[key] ? -1 : 1);
-        //   displayedData = sortData;
-        // } else if (clickedSortBtnOffsetY < 20) {
-        //   clickedSortBtn.className = "fas fa-sort-up sort-btn";
-        //   const sortData = data.slice().sort((a, b) => b[key] < a[key] ? -1 : 1);
-        //   displayedData = sortData;
-        // }
-
-
         updateTable(page);
       })
     })
