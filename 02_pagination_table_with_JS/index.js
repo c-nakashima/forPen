@@ -185,59 +185,48 @@ let currentPage = 1;
 const rowsPerPage = 4;
 const totalPage = Math.ceil(data.length / rowsPerPage);
 
-const prevBtn = document.getElementById('prevBtn')
-const nextBtn = document.getElementById('nextBtn')
-const firstBtn = document.getElementById('firstBtn')
-const lastBtn = document.getElementById('lastBtn')
+const tableWrapper = document.getElementById('tableWrapper');
 
+//draw table and thead 
+const table = document.createElement('table');
 //draw thead
-const thead = document.querySelector('thead');
-const dataKeys = Object.keys(data[1]); //TODO or directly 4? 
+const thead = document.createElement('thead');
+const columns = Object.keys(data[1]); //TODO もしデータが完璧じゃない場合はユーザーに表示するカラムを指定させる
 const tr = document.createElement('tr');
-for (let i = 0; i < dataKeys.length; i++) {
+for (let i = 0; i < columns.length; i++) {
   const th = document.createElement('th');
-  th.innerHTML = dataKeys[i];
-  th.insertAdjacentHTML('beforeend', '<i class="fas fa-sort sort-btn"></i>');
+  th.innerHTML = columns[i];
   tr.appendChild(th);
 }
 thead.appendChild(tr);
-
-//reset sort classname
-const sortBtns = document.getElementsByClassName('sort-btn');
-
-// function resetSortClass(exception = false){
-function resetSortClass(key = false){
-  for (let i = 0; i < sortBtns.length; i++) {
-    if(key !== sortBtns[i].getAttribute('data-type')){
-      sortBtns[i].className = "fas fa-sort sort-btn";
-    }
-  }
-}
+table.appendChild(thead);
+tableWrapper.appendChild(table);
 
 //draw tbody and make tbody updatable
-const tbody = document.querySelector('tbody');
+const tbody = document.createElement('tbody');
+table.appendChild(tbody);
 
 function updateTable(page) {
   currentPage = page;
   tbody.innerHTML = "";
-  for (
-    let i = (page - 1) * rowsPerPage;
-    i < page * rowsPerPage && i < displayedData.length;
-    i++) {
+  const startIndexInCurrentPage = (page - 1) * rowsPerPage;
+  const endIndexInCurrentPage = data.length > page * rowsPerPage ? page * rowsPerPage : data.length;
+  const rowsInCurrentPage = data.slice(startIndexInCurrentPage, endIndexInCurrentPage);
+  rowsInCurrentPage.forEach(row => {
     const tr = document.createElement('tr');
-    const dataValues = Object.values(displayedData[i]);
-    for (let j = 0; j < dataKeys.length; j++) {
+    const dataValues = Object.values(row);
+    dataValues.forEach(value => {
       const td = document.createElement('td');
-      td.innerHTML = dataValues[j];
+      td.innerHTML = value;
       tr.appendChild(td);
-    }
+    })
     tbody.appendChild(tr);
-  }
+  })
   updatePagination();
 }
 
 //display 5 pages maximum
-function surroundingPages() {
+function currentSurroundingPages() {
   let start, end;
   if (currentPage <= 3) {
     start = 1;
@@ -252,13 +241,32 @@ function surroundingPages() {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 }
 
+//insert pagination block area
+tableWrapper.insertAdjacentHTML(
+  'beforeend',
+  `<ul id="paginationBlock">
+    <li id="firstBtn">&lt;&lt;</li>
+    <li id="prevBtn">&lt;</li>
+    <li>
+      <ul id="pagination">
+      </ul>
+    </li>
+    <li id="nextBtn">&gt;</li>
+    <li id="lastBtn">&gt;&gt;</li>
+  </ul>`
+);
+
 //draw pagination and make it updatable current pagination style
 const pagination = document.getElementById('pagination');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const firstBtn = document.getElementById('firstBtn');
+const lastBtn = document.getElementById('lastBtn');
 function updatePagination() {
   pagination.innerHTML = "";
-  const surroundingPage = surroundingPages();
+  const surroundingPages = currentSurroundingPages();
 
-  for (const i of surroundingPage) {
+  for (const i of surroundingPages) {
     const pageBtn = document.createElement("li");
     pageBtn.innerHTML = i;
     pageBtn.setAttribute("class", "page-btn");
@@ -270,9 +278,9 @@ function updatePagination() {
 
   //hilight current page button
   const pageBtns = document.querySelectorAll(".page-btn");
-  for (let i = surroundingPage[0]; i <= surroundingPage[4]; i++) {
+  for (const i of surroundingPages) {
     if (currentPage === i) {
-      pageBtns[i - surroundingPage[0]].classList.add("current");
+      pageBtns[i - surroundingPages[0]].classList.add("current");
     }
   }
 
@@ -299,9 +307,7 @@ function updatePagination() {
 }
 
 //add eventlisteners to each buttons
-const resetSortBtn = document.getElementById('resetSortBtn');
-
-function addEventListenerToPagination(){
+function addEventListeners() {
   prevBtn.addEventListener("click", () => {
     updateTable(currentPage - 1);
   });
@@ -316,56 +322,6 @@ function addEventListenerToPagination(){
   });
 }
 
-
-function initSort(){
-    //set sort Buttotn
-
-    Array.from(sortBtns).forEach((sortBtn,i) =>{
-      sortBtn.setAttribute('data-type', dataKeys[i])
-      sortBtn.addEventListener('click', (e) => {
-        let page = currentPage;
-        let clickedSortBtn = e.target;
-        // let clickedSortBtnOffsetY = e.offsetY;
-
-        //reset other colomn's class name
-        const key = e.target.getAttribute('data-type');
-        resetSortClass(key);
-
-        // sort clicked colomn
-        const sortOrder = clickedSortBtn.classList.contains("fa-sort-down") ? 'up' : 'down';
-        console.log('sortOrder',sortOrder)
-        clickedSortBtn.className = `fas fa-sort-${sortOrder} sort-btn`; //TODO 正攻法で書いてみる
-
-        const sortData = data.slice().sort((a, b) => {
-          if(sortOrder === 'up'){
-            return a[key] < b[key] ? -1 : 1
-          }else if(sortOrder === 'down'){
-            return b[key] < a[key] ? -1 : 1
-          }
-        });
-
-        displayedData = sortData;
-        updateTable(page);
-      })
-    })
-
-    //set reset Buttotn
-    resetSortBtn.addEventListener('click', () => {
-      resetSortClass();
-      page = currentPage;
-      displayedData = data;
-      updateTable(page);
-    })
-}
-
-
 //init
-let displayedData;
-function init() {
-  displayedData = data;
-  updateTable(1);
-  addEventListenerToPagination();
-  initSort();
-}
-
-init();
+updateTable(1)
+addEventListeners()
